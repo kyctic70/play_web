@@ -73,7 +73,7 @@ export default {
       });
       //成功后执行的操作
       this.allDateList = data.list;
-      // console.log("allDateList", this.allDateList);
+      console.log("allDateList", this.allDateList);
       this.allDateList.filter(item => {
         if (item.P7.length == 2) {
           this.provinceList.push(item);
@@ -110,7 +110,7 @@ export default {
   mounted() {
     this.haha();
 window.alert("123");
-window.console.log("我爱中国git");
+window.console.log("我爱中国git123gi");
 
   }
 };

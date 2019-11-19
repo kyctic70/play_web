@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <button>提交</button>
     <div style=" display:flex;">
@@ -109,6 +109,7 @@ export default {
   },
   mounted() {
     this.haha();
+window.alert("123");
   }
 };
 </script>

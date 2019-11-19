@@ -1,58 +1,129 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div>
+    <button>提交</button>
+    <div style=" display:flex;">
+      <div v-for="(item,i) in areaArrTabTitle" :key="i" class="tab_head" @click="tabCC(i)">{{item}}</div>
+    </div>
+    <div class="tab_content">
+      <div v-show="provinceShow">
+        <div
+          v-for="(provinceItem,provinceIndex) in provinceList"
+          :key="provinceIndex"
+          @click="decisionProvince(provinceItem)"
+        >{{provinceItem.P2}}</div>
+      </div>
+      <div v-show="cityShow">
+        <div
+          v-for="(cityItem,cityIndex) in cityListCurr"
+          :key="cityIndex"
+          @click="decisionCity(cityItem)"
+        >{{cityItem.P2}}</div>
+      </div>
+      <div v-show="areaShow">
+        <div v-for="(areaItem,areaIndex) in areaListCurr" :key="areaIndex">{{areaItem.P2}}</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  name: "HelloWorld",
+  props: {},
+  data() {
+    return {
+      provinceShow: true,
+      cityShow: false,
+      areaShow: false,
+      allDateList: [],
+      areaArrTabTitle: ["省份", "城市", "地区"],
+      provinceList: [],
+      cityList: [],
+      cityListCurr: [],
+      areaList: [],
+      areaListCurr: []
+    };
+  },
+  methods: {
+    tabCC(i) {
+      if (i == 0) {
+        (this.provinceShow = true),
+          (this.cityShow = false),
+          (this.areaShow = false);
+      } else if (i == 1) {
+        (this.cityShow = true),
+          (this.provinceShow = false),
+          (this.areaShow = false);
+      } else if (i == 2) {
+        (this.areaShow = true),
+          (this.provinceShow = false),
+          (this.cityShow = false);
+      }
+    },
+    async haha() {
+      let { data } = await axios({
+        method: "post",
+        url: "http://120.76.160.41:3000/crossList?page=dmagic_area",
+        data: {
+          //传给后端的值
+          pageSize: 100000
+        }
+      }).catch(function(error) {
+        console.log("异常:" + error);
+      });
+      //成功后执行的操作
+      this.allDateList = data.list;
+      // console.log("allDateList", this.allDateList);
+      this.allDateList.filter(item => {
+        if (item.P7.length == 2) {
+          this.provinceList.push(item);
+        } else if (item.P7.length == 4) {
+          this.cityList.push(item);
+          // console.log("provinceList",this.provinceList);
+        } else if (item.P7.length == 6) {
+          this.areaList.push(item);
+          //  console.log("provinceList", this.areaList);
+        }
+      });
+    },
+    decisionProvince(data) {
+      this.cityList.filter(item => {
+        if (data.P7 == item.P8) {
+          this.cityListCurr.push(item),
+            (this.cityShow = true),
+            (this.provinceShow = false),
+            (this.areaShow = false);
+        }
+      });
+    },
+    decisionCity(data) {
+      this.areaList.filter(item => {
+        if (data.P7 == item.P8) {
+          this.areaListCurr.push(item),
+            (this.areaShow = true),
+            (this.provinceShow = false),
+            (this.cityShow = false);
+        }
+      });
+    }
+  },
+  mounted() {
+    this.haha();
   }
-}
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+.tab_head {
+  flex-grow: 1;
+  background: orange;
+  border: 1px solid #000;
+  height: 50px;
+  text-align: center;
+  line-height: 50px;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.tab_content {
+  border: 1px red solid;
 }
 </style>

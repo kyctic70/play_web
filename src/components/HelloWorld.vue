@@ -110,6 +110,8 @@ export default {
   mounted() {
     this.haha();
 window.alert("123");
+window.console.log("我爱中国git");
+
   }
 };
 </script>
